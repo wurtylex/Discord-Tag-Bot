@@ -1,0 +1,14 @@
+{
+  "name": "btouchbot",
+  "version": "1.0.0",
+  "description": "A simple bot for banana touch",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "wurtylex",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  }
+}

@@ -1,27 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { member } = require('../../../roles.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('register')
         .setDescription('Registers a member by assigning them the Banana Evaders role'),
     async execute(interaction) {
-        const roleName = 'Banana Evaders';
-
-        let roleToAssign = interaction.guild.roles.cache.find(role => role.name === roleName);
-
-        if (!roleToAssign) {
-            try {
-                roleToAssign = await interaction.guild.roles.create({
-                    name: roleName,
-                    color: '#ADD8E6',
-                    hoist: true,
-                    mentionable: true,
-                });
-            } catch (error) {
-                console.error('Failed to create the role:', error);
-                return interaction.reply('Failed to register member. Please try again later.');
-            }
-        }
+        let roleToAssign = interaction.guild.roles.cache.find(role => role.name === member);
 
         if (interaction.member.roles.cache.some(role => role.id === roleToAssign.id)) { 
             return interaction.reply('You are already registered.'); 

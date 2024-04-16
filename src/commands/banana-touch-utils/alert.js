@@ -1,26 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { alerts } = require('../../../roles.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('alert')
         .setDescription('Registers a member for alerts! Using it with the role takes it off.'),
     async execute(interaction) {
-        const roleName = '!!! (alert)';
-
-        let roleToAssign = interaction.guild.roles.cache.find(role => role.name === roleName);
-
-        if (!roleToAssign) {
-            try {
-                roleToAssign = await interaction.guild.roles.create({
-                    name: roleName,
-                    color: '#FF474C',
-                    mentionable: true,
-                });
-            } catch (error) {
-                console.error('Failed to create the role:', error);
-                return interaction.reply('Failed to register member. Please try again later.');
-            }
-        }
+        let roleToAssign = interaction.guild.roles.cache.find(role => role.name === alerts);
 
         if (interaction.member.roles.cache.some(role => role.id === roleToAssign.id)) { 
             const roleToRemove = interaction.guild.roles.cache.find(role => role.name === roleName);

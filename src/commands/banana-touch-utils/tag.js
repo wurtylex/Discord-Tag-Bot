@@ -1,4 +1,5 @@
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
+const { channel_alerts, member, tagger, alerts } = require('../../../roles.json');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,33 +10,11 @@ module.exports = {
                 .setDescription('The user you want to tag')
                 .setRequired(true)),
     async execute(interaction) {
-        const hasBananaEvadersRole = interaction.member.roles.cache.some(role => role.name === 'Banana Evaders');
-        const hasSoiledBananaRole = interaction.member.roles.cache.some(role => role.name === 'Soiled Banana');
-    
-        const isAdmin = interaction.member.permissionsIn(interaction.channel).has(PermissionsBitField.Flags.Administrator);
+        // Check for premissions 
+        const hasRoles = [member, tagger].every(roleName => interaction.member.roles.cache.some(role => role.name === roleName));
 
-        if (!(hasBananaEvadersRole && hasSoiledBananaRole) && !isAdmin) {
+        if (!hasRoles) {
             return interaction.reply('You do not have permission to use this command.');
-        }
-
-        const roleName = 'Soiled Banana';
-        const highestAccessable = interaction.guild.roles.cache.reduce((prev, role) => (prev.position > role.position ? prev : role)).position;
-
-        let roleToAssign = interaction.guild.roles.cache.find(role => role.name === roleName);
-
-        if (!roleToAssign) {
-            try {
-                roleToAssign = await interaction.guild.roles.create({
-                    name: roleName,
-                    color: '#880808',
-                    hoist: true,
-                    mentionable: true,
-                    position: highestAccessable - 1,
-                });
-            } catch (error) {
-                console.error('Failed to create the role:', error);
-                return interaction.reply('Failed to register member. Please try again later.');
-            }
         }
 
         // Grab and check user 
@@ -43,27 +22,21 @@ module.exports = {
         if (!user) { return interaction.reply('User not found.'); }
 
         await user.fetch();
-        const userHasBananaEvadersRole = user.roles.cache.some(role => role.name === 'Banana Evaders');
-        const userHasSoiledBananaRole = user.roles.cache.some(role => role.name === 'Soiled Banana');
 
-        if (userHasSoiledBananaRole) {
+        if (user.roles.cache.some(role => role.name === tagger)) {
             return interaction.reply(`You can't tag someone with the tag. That's like cutting the leg off of a guy who doesn't have his legs!`)
         }
 
+        const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
 
-        const channelId = "1228245395570819134";
-        const channel = interaction.guild.channels.cache.get(channelId);
-
-        if (userHasBananaEvadersRole) {
-            const roleToRemove = interaction.guild.roles.cache.find(role => role.name === 'Soiled Banana');
-            await interaction.member.roles.remove(roleToRemove);
-            await user.roles.add(roleToAssign);
+        if (user.roles.cache.some(role => role.name === member)) {
+            await interaction.member.roles.remove(interaction.guild.roles.cache.find(role => role.name === tagger));
+            await user.roles.add(interaction.guild.roles.cache.find(role => role.name === tagger));
             await interaction.reply(`${user} is it! Congrats for getting rid of your tag!`);
 
             if (channel && channel.type == 0) {
-                const roleId = '1228337175582605393'; 
-                const roleMention = `<@&${roleId}>`;
-                channel.send(`${roleMention} ${user} is it!`);
+                const role = interaction.guild.roles.cache.find(role => role.name === alerts)
+                channel.send(`${role}. The player ${user} is it!`);
             } else {
                 console.error('Channel not found or not a text channel.');
             }

@@ -4,11 +4,15 @@
   "description": "A simple bot for banana touch",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "nodemon --exec 'node src/deploy-commands.js && node .'"
   },
   "author": "wurtylex",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
   }
 }

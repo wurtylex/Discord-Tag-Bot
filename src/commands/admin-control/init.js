@@ -4,7 +4,8 @@ const { channel_alerts, alerts, member, tagger } = require('../../../roles.json'
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('init')
-        .setDescription('Initalizes all roles in an order that works.'),
+        .setDescription('Initalizes all roles and setups up needed channels in an order that works.')
+        .setDefaultMemberPermissions(PermissionsBitField.Administrator),
     async execute(interaction) {
         async function createRole(guild, roleName, options) {
             let creation = guild.roles.cache.find(role => role.name === roleName);
@@ -21,12 +22,6 @@ module.exports = {
                 }
             }
         }
-        const admin = interaction.member.permissionsIn(interaction.channel).has(PermissionsBitField.Flags.Administrator);
-
-        if (!admin) {
-            return interaction.reply('Admin only command.');
-        }
-
         try {
             await createRole(interaction.guild, alerts, {
                 color: '#FF474C',

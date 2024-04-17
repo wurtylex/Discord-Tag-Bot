@@ -27,13 +27,14 @@ module.exports = {
             return interaction.reply(`You can't tag someone with the tag. That's like cutting the leg off of a guy who doesn't have his legs!`)
         }
 
-        const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
-
         if (user.roles.cache.some(role => role.name === member)) {
+            // Update the user 
             await interaction.member.roles.remove(interaction.guild.roles.cache.find(role => role.name === tagger));
             await user.roles.add(interaction.guild.roles.cache.find(role => role.name === tagger));
             await interaction.reply(`${user} is it! Congrats for getting rid of your tag!`);
 
+            const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
+            // Send message public humiliation
             if (channel && channel.type == 0) {
                 const role = interaction.guild.roles.cache.find(role => role.name === alerts)
                 channel.send(`${role}. The player ${user} is it!`);

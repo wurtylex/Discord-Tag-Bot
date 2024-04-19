@@ -5,21 +5,23 @@ const COLORS = {
 
 class Node {
     constructor(param) {
-        this.key = param.key || 0; 
+        this.key = param.key || -1; 
         this.color = param.color || COLORS.RED;
         this.left = param.left || null;
         this.right = param.right || null;
         this.parent = param.parent || null;
         this.cnt = param.cnt || 1; 
+        this.ids = param.ids || [];
     }
 }
 
 class RBTree {
     constructor() {
-        this.leaf = new Node({ key: 0, color: COLORS.BLACK });
+        this.leaf = new Node({ key: -1, color: COLORS.BLACK });
         this.root = this.leaf; 
     }
 
+    
     printTree() {
         const stack = [
             { node: this.root, str: '' },
@@ -39,7 +41,7 @@ class RBTree {
                 position = 'ROOT-';
             }
 
-            console.log(`${item.str}${position} ${item.node.key} (${item.node.color}) - Count: ${item.node.cnt}`);
+            console.log(`${item.str}${position} ${item.node.key} (${item.node.color}) - Count: ${item.node.cnt} - Ids: ${item.node.ids}`);
     
             stack.push({ node: item.node.right, str: item.str + '     ' });
             stack.push({ node: item.node.left, str: item.str + ' |   ' });
@@ -50,7 +52,7 @@ class RBTree {
      * @param {number} key - key to insert
     */
 
-    insert({key}) {
+    insert(key, id) {
         const newNode = new Node({ key: key, left: this.leaf, right: this.leaf });
 
         let parent = null;
@@ -64,11 +66,13 @@ class RBTree {
                 current = current.right;
             } else {
                 current.cnt++;
+                current.ids.push(id);
                 return;
             }
         }
 
         newNode.parent = parent;
+        newNode.ids.push(id);
 
         if (parent === null) {
             this.root = newNode;
@@ -230,7 +234,7 @@ class RBTree {
      * @param {number} key - key to delete
     */
 
-    deleteNode(key) {
+    deleteNode(key, id) {
         let forRemove = this.leaf;
         let tmp = this.root;
     
@@ -254,6 +258,7 @@ class RBTree {
         forRemove.cnt--;
 
         if (forRemove.cnt > 0) {
+            forRemove.ids = forRemove.ids.filter(i => i !== id);
             return;
         }
 
@@ -358,28 +363,71 @@ class RBTree {
 
         node.color = COLORS.BLACK;
     }
+
+    upgradeNode(key, id) {
+        let forUpgrade = this.leaf;
+        let tmp = this.root;
+    
+        while (tmp != this.leaf) {
+            if (tmp.key === key) {
+                forUpgrade = tmp;
+                break;
+            }
+    
+            if (tmp.key > key) {
+                tmp = tmp.left;
+            } else {
+                tmp = tmp.right;
+            }
+        }
+
+        // Not Found
+        if (forUpgrade == this.leaf) {
+            return;
+        }
+
+        this.deleteNode(key, id);
+
+        this.insert(forUpgrade.key + 1, id);
+    }
+
+    getInOrder() {
+        let keys = []; 
+        return this.getInOrderHelper(this.root, keys);
+    }
+
+    getInOrderHelper(node, keys) {
+        if (!node) return; 
+        if (node.key === -1) return;
+
+        this.getInOrderHelper(node.left, keys);
+
+        keys.push(node.key);
+
+        this.getInOrderHelper(node.right, keys); 
+
+        return keys;
+    }
 }
 
 /*
 const tree = new RBTree();
-tree.insert({ key: 5 });
-tree.insert({ key: 3 });
-tree.insert({ key: 42 });
-tree.insert({ key: 2 });
-tree.insert({ key: 19 });
-tree.insert({ key: 6 });
-tree.insert({ key: 5 });
-tree.insert({ key: 5 });
+
+tree.insert(5, 1);
+tree.insert(3, 2);
+tree.insert(42, 3);
+tree.insert(2, 4);
+tree.insert(19, 5);
+tree.insert(5, 6);
+tree.insert(5, 7);
 
 tree.printTree();
 
-tree.deleteNode(5); 
+tree.upgradeNode(5, 1); 
 
 tree.printTree();
 
-tree.deleteNode(19);
-
-tree.printTree();
+console.log(tree.getInOrder()); 
 */
 
-export default RBTree;
+module.exports = RBTree;

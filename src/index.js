@@ -3,6 +3,7 @@ const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('../config.json');
 const { Tags } = require('./database.js');
+const RBTree = require('./RBTree.js'); 
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -26,6 +27,16 @@ for (const folder of commandFolders) {
 
 client.once(Events.ClientReady, readyClient => {
 	Tags.sync();
+	const tree = new RBTree();
+	tree.insert(1,1);
+	tree.printTree(); 
+	/*
+	Tags.findAll({ attributes: ['times_tagged'] }).then(tags => {
+		tags.forEach(tag => {
+			tree.insert({ key: tag.times_tagged })
+		});
+	});
+	*/
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 
@@ -51,3 +62,5 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 client.login(token);
+
+//module.exports = tree;

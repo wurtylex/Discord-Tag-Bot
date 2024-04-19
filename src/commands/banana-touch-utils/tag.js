@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { channel_alerts, member, tagger, alerts } = require('../../../roles.json');
+const { Tags } = require('../../database.js');
+//const { tree } = require('../../index.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -32,6 +34,10 @@ module.exports = {
             await interaction.member.roles.remove(interaction.guild.roles.cache.find(role => role.name === tagger));
             await user.roles.add(interaction.guild.roles.cache.find(role => role.name === tagger));
             await interaction.reply(`${user} is it! Congrats for getting rid of your tag!`);
+
+            // update the database
+            Tags.increment('times_tagged', { where: { id: user.id } });
+            //tree.upgradeNode(Tags.findOne({ where: { id: user.id } }) - 1, user.id);
 
             const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
             // Send message public humiliation

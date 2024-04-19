@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, ChannelType, PermissionsBitField } = require('discord.js');
 const { channel_alerts, alerts, member, tagger } = require('../../../roles.json');
+const { Tags, sequelize } = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,6 +8,8 @@ module.exports = {
         .setDescription('Initalizes all roles and setups up needed channels in an order that works.')
         .setDefaultMemberPermissions(PermissionsBitField.Administrator),
     async execute(interaction) {
+        if (!(interaction.guild.ownerId === interaction.user.id)) return interaction.reply('Owner only command, superseeds all permissions.'); 
+
         async function createRole(guild, roleName, options) {
             let creation = guild.roles.cache.find(role => role.name === roleName);
         
@@ -62,6 +65,37 @@ module.exports = {
             })
             .catch(console.error);
         }
+
+        channel.messages.fetch().then(async (messages) => {
+            let pings = {};
+            messages.forEach(message => {
+                if (message.mentions.users.size > 0) {
+                    message.mentions.users.forEach(user => {
+                        if (!pings[user.id]) {
+                            pings[user.id] = { count: 0, latest: null };
+                        }
+                        pings[user.id].count += 1;
+                        if (!pings[user.id].latest || message.createdAt > pings[user.id].latest) {
+                            pings[user.id].latest = message.createdAt;
+                        }
+                    });
+                }
+            });
+
+            for (let id in pings) {
+                try {
+                    await Tags.upsert({
+                        id: id,
+                        lastTagged: pings[id].latest,
+                        times_tagged: pings[id].count
+                    });
+                }
+                catch (error) {
+                    console.log('Failed to register member:', error);
+                }
+            }
+        }).catch(console.error);
+
         return interaction.reply('Server properly setup.');
     },
 };

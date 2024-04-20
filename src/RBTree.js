@@ -60,9 +60,9 @@ class RBTree {
 
         while (current !== this.leaf) {
             parent = current;
-            if (newNode.key < current.key) {
+            if (key < current.key) {
                 current = current.left;
-            } else if (newNode.key > current.key) {
+            } else if (key > current.key) {
                 current = current.right;
             } else {
                 current.cnt++;

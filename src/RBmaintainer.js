@@ -9,8 +9,8 @@ class RBMaintainer {
 
     async initialize() {
         const tags = await this.tags.findAll({ attributes: ['id', 'times_tagged']});
-        tags.forEach(tag => { 
-            this.tree.insert(tag.times_tagged, tag.id);
+        tags.forEach(async tag => { 
+            this.tree.insert(tag.times_tagged + 1, tag.id);
         });
     }
 
@@ -20,7 +20,7 @@ class RBMaintainer {
             return;
         }
 
-        await this.tree.upgradeNode(tag.times_tagged, id);
+        await this.tree.upgradeNode(tag.times_tagged + 1, id);
     }
 
     async printTree() {
@@ -28,7 +28,7 @@ class RBMaintainer {
     }
 
     async insert(id) {
-        await this.tree.insert(1, id);
+        this.tree.insert(1, id);
     }
 
     getInOrder() {

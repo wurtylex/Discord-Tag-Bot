@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ChannelType, PermissionsBitField } = require('discord.js');
 const { channel_alerts, alerts, member, tagger } = require('../../../roles.json');
 const { Tags } = require('../../database.js');
+const tree = require('../../RBmaintainer.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -66,6 +67,7 @@ module.exports = {
             .catch(console.error);
         }
 
+
         await interaction.guild.members.fetch().catch(console.error);
 
         const role = interaction.guild.roles.cache.find(role => role.name === member);
@@ -88,7 +90,7 @@ module.exports = {
             console.log('Role not found.');
         }
 
-        channel.messages.fetch().then(async (messages) => {
+        await channel.messages.fetch().then(async (messages) => {
             let pings = {};
             messages.forEach(message => {
                 if (message.mentions.users.size > 0) {
@@ -97,9 +99,6 @@ module.exports = {
                             pings[user.id] = { count: 0, latest: null };
                         }
                         pings[user.id].count += 1;
-                        if (!pings[user.id].latest || message.createdAt > pings[user.id].latest) {
-                            pings[user.id].latest = message.createdAt;
-                        }
                     });
                 }
             });
@@ -109,7 +108,8 @@ module.exports = {
                     await Tags.upsert({
                         id: id,
                         lastTagged: pings[id].latest,
-                        times_tagged: pings[id].count
+                        times_tagged: pings[id].count,
+                        gold: 10
                     });
                 }
                 catch (error) {
@@ -117,6 +117,9 @@ module.exports = {
                 }
             }
         }).catch(console.error);
+
+        await tree.initialize(); 
+        await tree.printTree();
 
         return interaction.reply('Server properly setup.');
     },

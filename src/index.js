@@ -38,6 +38,8 @@ client.once(Events.ClientReady, async readyClient => {
 	//await Tags.sync({ force: true });
 	await Tags.sync();
 	await tree.initialize();
+	await tree.printTree(); 
+	console.log(tree.getInOrder());	
 
 	cron.schedule('0 12 * * *', async () => {
         const role = readyClient.guilds.cache.first().roles.cache.find(role => role.name === tagger);

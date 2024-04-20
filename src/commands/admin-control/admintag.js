@@ -35,7 +35,8 @@ module.exports = {
 
             // update the tree and the database
             await tree.upgrade(prey.id.toString()); 
-            Tags.increment('times_tagged', { where: { id: prey.id } });
+            await Tags.increment('times_tagged', { where: { id: prey.id } });
+            await tree.printTree();
 
             const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
             // Send message public humiliation

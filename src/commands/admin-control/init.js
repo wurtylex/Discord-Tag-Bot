@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ChannelType, PermissionsBitField } = require('discord.js');
 const { channel_alerts, alerts, member, tagger } = require('../../../roles.json');
-const { Tags, sequelize } = require('../../database.js');
+const { Tags } = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -64,6 +64,28 @@ module.exports = {
                 console.log(`Channel created: ${channel.name}`);
             })
             .catch(console.error);
+        }
+
+        await interaction.guild.members.fetch().catch(console.error);
+
+        const role = interaction.guild.roles.cache.find(role => role.name === member);
+
+        if (role) {
+            const memberIds = interaction.guild.members.cache.filter(member => member.roles.cache.has(role.id)).map(member => member.id);
+            for (const id of memberIds) {
+                try {
+                    await Tags.upsert({
+                        id: id,
+                        lastTagged: null,
+                        times_tagged: 0,
+                        gold: 10
+                    });
+                } catch (error) {
+                    console.log('Failed to add user to database:', error);
+                }
+            }
+        } else {
+            console.log('Role not found.');
         }
 
         channel.messages.fetch().then(async (messages) => {

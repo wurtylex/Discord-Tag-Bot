@@ -29,6 +29,10 @@ class RBMaintainer {
         this.tree.printTree();
     }
 
+    async insert(id) {
+        await this.tree.insert(1, id);
+    }
+
     getInOrder() {
         return this.tree.getInOrder();
     }

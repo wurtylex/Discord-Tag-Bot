@@ -5,7 +5,14 @@ const { token } = require('../config.json');
 const { Tags } = require('./database.js');
 const tree = require('./RBmaintainer.js');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMembers,
+	],
+});
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -26,7 +33,7 @@ for (const folder of commandFolders) {
 }
 
 client.once(Events.ClientReady, async readyClient => {
-	await Tags.sync();
+	await Tags.sync({ force: true });
 	await tree.initialize();
 	await tree.printTree(); 
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);

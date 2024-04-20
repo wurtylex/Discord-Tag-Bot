@@ -21,8 +21,6 @@ class RBMaintainer {
         }
 
         await this.tree.upgradeNode(tag.times_tagged, id);
-
-        await this.tree.printTree(); 
     }
 
     async printTree() {

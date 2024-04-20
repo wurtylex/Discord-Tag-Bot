@@ -4,6 +4,8 @@ const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('../config.json');
 const { Tags } = require('./database.js');
 const tree = require('./RBmaintainer.js');
+const cron = require('node-cron');
+const { tagger } = require('../roles.json');
 
 const client = new Client({
 	intents: [
@@ -33,9 +35,30 @@ for (const folder of commandFolders) {
 }
 
 client.once(Events.ClientReady, async readyClient => {
-	await Tags.sync({ force: true });
+	//await Tags.sync({ force: true });
+	await Tags.sync();
 	await tree.initialize();
-	await tree.printTree(); 
+
+	cron.schedule('0 12 * * *', async () => {
+        const role = readyClient.guilds.cache.first().roles.cache.find(role => role.name === tagger);
+
+        if (!role) {
+            console.log('Role not found.');
+            return;
+        }
+
+        const members = await readyClient.guilds.cache.first().members.fetch();
+        const membersWithoutRole = members.filter(member => !member.roles.cache.has(role.id));
+
+        for (const member of membersWithoutRole.values()) {
+            const tag = await Tags.findOne({ where: { id: member.id } });
+            if (tag) {
+                tag.gold += 1;
+                await tag.save();
+            }
+        }
+    });
+
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
 

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { member } = require('../../../roles.json');
+const { Tags } = require('../../database.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,6 +16,7 @@ module.exports = {
         try {
             await interaction.member.roles.add(roleToAssign);
             await interaction.reply('Successfully registered!');
+            Tags.create({ id: interaction.member.id, times_tagged: 0, gold: 10 });
         } catch (error) {
             console.error('Failed to register member:', error);
             await interaction.reply('Failed to register member. Please try again later.');

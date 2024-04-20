@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js') 
 const { channel_alerts, member, tagger, alerts } = require('../../../roles.json');
+const { Tags } = require('../../database.js');
+const tree = require('../../RBmaintainer.js');
 
 module.exports = {
     data: new SlashCommandBuilder() 
@@ -30,6 +32,10 @@ module.exports = {
             await predator.roles.remove(interaction.guild.roles.cache.find(role => role.name === tagger));
             await prey.roles.add(interaction.guild.roles.cache.find(role => role.name === tagger));
             await interaction.reply(`Tag has been passed from ${predator} to ${prey}.`);
+
+            // update the tree and the database
+            await tree.upgrade(prey.id.toString()); 
+            Tags.increment('times_tagged', { where: { id: prey.id } });
 
             const channel = interaction.guild.channels.cache.find(channel => channel.name === channel_alerts);
             // Send message public humiliation

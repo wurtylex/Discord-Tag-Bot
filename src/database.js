@@ -8,7 +8,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
     host: 'localhost',
     dialect: 'sqlite', 
     logging: false, 
-    storage: 'database.sqlite'
+    storage: 'database.sqlite',
 });
 
 const Tags = sequelize.define('tags', { 
@@ -27,6 +27,26 @@ const Tags = sequelize.define('tags', {
         type: Sequelize.INTEGER,
         defaultValue: 10,
         allowNull: false,
+    },
+    tagged: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false, 
+        allowNull: false
+    },
+    banned: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+    banned_until: {
+        type: Sequelize.DATE,
+        defaultValue: null,
+        allowNull: true
+    },
+    bounty: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
     },
 });
 

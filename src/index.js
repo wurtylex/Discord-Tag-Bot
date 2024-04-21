@@ -5,7 +5,7 @@ const { token } = require('../config.json');
 const { Tags } = require('./database.js');
 const tree = require('./RBmaintainer.js');
 const cron = require('node-cron');
-const { tagger } = require('../roles.json');
+const { tagger, channel_alerts } = require('../roles.json');
 
 const client = new Client({
 	intents: [
@@ -38,10 +38,14 @@ client.once(Events.ClientReady, async readyClient => {
 	//await Tags.sync({ force: true });
 	await Tags.sync();
 	await tree.initialize();
-	await tree.printTree(); 
-	console.log(tree.getInOrder());	
+	//await tree.printTree(); 
+	//console.log(tree.getInOrder());	
 
-	cron.schedule('0 12 * * *', async () => {
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * max);
+	}
+
+	cron.schedule('11 13 * * *', async () => {
         const role = readyClient.guilds.cache.first().roles.cache.find(role => role.name === tagger);
 
         if (!role) {
@@ -59,6 +63,49 @@ client.once(Events.ClientReady, async readyClient => {
                 await tag.save();
             }
         }
+		
+		// implement bounty here 
+		let participants = tree.getInOrder();
+
+		const guild = readyClient.guilds.cache.first(); // replace with your guild
+		const taggerRole = guild.roles.cache.find(role => role.name === tagger);
+
+		if (!taggerRole) {
+			console.log('Role not found.');
+			return;
+		}
+
+		for (const participant of participants.flat()) {
+			const tag = await Tags.findOne({ where: { id: participant } });
+			if (tag) {
+				tag.bounty = false;
+				await tag.save();
+			}
+		}
+
+		const alertsChannel = guild.channels.cache.find(channel => channel.name === channel_alerts);
+
+		if (!alertsChannel) {
+			console.log('Alerts channel not found.');
+			return;
+		}
+
+		for (let i = participants.length - 1; i >= 0; i--) {
+			if (0.5 < Math.random()) {	
+				const potentialBounty = participants[i][getRandomInt(participants[i].length)];
+				const potentialBountyMember = await guild.members.fetch(potentialBounty);
+				if (!potentialBountyMember.roles.cache.has(taggerRole)) {
+					console.log(potentialBounty); 
+					const tag = await Tags.findOne({ where: { id: potentialBounty } });
+					if (tag) {
+						tag.bounty = true; 
+						await tag.save(); 
+					}
+					return await alertsChannel.send(`The player ${potentialBountyMember} is bounty!`);
+				}
+			}
+			if (i == 0) i = participants.length - 1;
+		}
     });
 
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);

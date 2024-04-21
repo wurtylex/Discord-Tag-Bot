@@ -80,7 +80,11 @@ module.exports = {
                         id: id,
                         lastTagged: null,
                         times_tagged: 0,
-                        gold: 10
+                        gold: 10,
+                        tagged: false,
+                        banned: false,
+                        banned_until: null,
+                        bounty: false,
                     });
                 } catch (error) {
                     console.log('Failed to add user to database:', error);
@@ -99,17 +103,27 @@ module.exports = {
                             pings[user.id] = { count: 0, latest: null };
                         }
                         pings[user.id].count += 1;
+                        if (!pings[user.id].latest || message.createdAt > pings[user.id].latest) {
+                            pings[user.id].latest = message.createdAt;
+                        }
                     });
                 }
             });
 
             for (let id in pings) {
+                const user = interaction.guild.members.cache.get(id);
+                let has_tag = false;
+                if (user.roles.cache.some(role => role.name === tagger)) has_tag = true; 
                 try {
                     await Tags.upsert({
                         id: id,
                         lastTagged: pings[id].latest,
                         times_tagged: pings[id].count,
-                        gold: 10
+                        gold: 10,
+                        tagged: has_tag,
+                        banned: false,
+                        banned_until: null,
+                        bounty: false,
                     });
                 }
                 catch (error) {

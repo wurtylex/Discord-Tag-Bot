@@ -408,6 +408,24 @@ class RBTree {
 
         return keys;
     }
+
+    /**
+     * @param {number} id - id to search for
+     * @returns {boolean} - true if node exists, false otherwise
+     */
+    search(id) {
+        let current = this.root;
+        while (current !== this.leaf) {
+            if (current.ids.includes(id)) {
+                return true;
+            } else if (id < current.key) {
+                current = current.left;
+            } else {
+                current = current.right;
+            }
+        }
+        return false;
+    }
 }
 
 /*

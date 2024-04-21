@@ -36,8 +36,8 @@ module.exports = {
         const embeds = await Promise.all(ids.map(async (idChunk, index) => {
             const embed = new EmbedBuilder()
                 .setTitle(`Hall of Shame! Page: ${index + 1}`)
-                .setTimestamp();
-
+                .setTimestamp()
+                .setColor('#FFD700');
             let tempRank = 1; 
 
             await Promise.all(idChunk.map(async (id) => {

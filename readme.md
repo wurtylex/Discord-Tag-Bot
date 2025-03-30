@@ -12,3 +12,7 @@ The person who has the tag should get the *Banana Toucher* role, anyone else who
 # Some QOL changes that may happen.
 - Doesn't display the page number in /history (this is actually kind of annoying to do) 
 - An admin dashboard.
+# Some history
+- First Banana Touch did not have a bot
+- Second Banana Touch had a bot that was in trash_code branch
+- Third (and final) Banana Touch was written since the last one's code was too trashy to build ontop of and we needed a database

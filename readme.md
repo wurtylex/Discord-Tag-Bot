@@ -1,4 +1,4 @@
-A simple Discord bot for tracking who has the tag.
+A simple Discord bot for tracking who has the tag. (We use cheese touch, except we aren't cheese we are banana since banana's are cooler.)
 # Slash Commands:
 - **/init** – Randomly assigns a player the tag and creates the roles _Banana Toucher_ and _Banana_.
 - **/join** – Adds the player to the database, making them taggable.
@@ -12,7 +12,7 @@ The person who has the tag should get the *Banana Toucher* role, anyone else who
 # Some QOL changes that may happen.
 - Doesn't display the page number in /history (this is actually kind of annoying to do) 
 - An admin dashboard.
-# Some history
+# Some History
 - First Banana Touch did not have a bot
 - Second Banana Touch had a bot that was in trash_code branch
 - Third (and final) Banana Touch was written since the last one's code was too trashy to build ontop of and we needed a database

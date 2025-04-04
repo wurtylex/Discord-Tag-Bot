@@ -8,7 +8,7 @@ A simple Discord bot for tracking who has the tag. (We use cheese touch, except 
 - **/history** - Shows the last tags.
 The person who has the tag should get the *Banana Toucher* role, anyone else who is a participant should have the *Banana* role. This process is done by using utils/syncServerState.js which will update everyone based on the table. Reason for working this way because there aren't too many people playing and this makes the code easier. 
 # Known Problems
-- Running the /history embed will crash the server and the world will end.
+- Running the /history embed will crash the server and the world will end <https://github.com/wurtylex/Discord-Tag-Bot/issues/1>
 # Some QOL changes that may happen.
 - Doesn't display the page number in /history (this is actually kind of annoying to do) 
 - An admin dashboard.

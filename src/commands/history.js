@@ -1,3 +1,4 @@
+/*
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const Database = require('better-sqlite3');
 const path = require('path');
@@ -143,3 +144,4 @@ module.exports = {
     });
   },
 };
+*/
